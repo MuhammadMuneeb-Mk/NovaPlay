@@ -38,10 +38,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Forgot Password?",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
+                const Text("Forgot Password?", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _emailController,

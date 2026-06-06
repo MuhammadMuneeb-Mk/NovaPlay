@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/download_provider.dart';
 import '../models/game.dart';
+import '../widgets/game_image.dart';
 
 class DownloadsScreen extends StatefulWidget {
   final Game? gameToDownload;
@@ -67,9 +68,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           ),
         Expanded(
           child: downloads.isEmpty && !_isDownloading
-              ? const Center(
-            child: Text('No downloaded games yet.\nGo to Library and download some!'),
-          )
+              ? const Center(child: Text('No downloaded games yet.\nGo to Library and download some!'))
               : ListView.builder(
             itemCount: downloads.length,
             itemBuilder: (context, index) {
@@ -77,14 +76,12 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               return Card(
                 margin: const EdgeInsets.all(8),
                 child: ListTile(
-                  leading: Image.asset(game.image, width: 50, height: 50, fit: BoxFit.cover),
+                  leading: GameImage(imagePath: game.image, width: 50, height: 50),
                   title: Text(game.title),
                   subtitle: Text(game.description),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      Provider.of<DownloadProvider>(context, listen: false).removeDownload(game);
-                    },
+                    onPressed: () => Provider.of<DownloadProvider>(context, listen: false).removeDownload(game),
                   ),
                 ),
               );

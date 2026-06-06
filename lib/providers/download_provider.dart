@@ -18,7 +18,7 @@ class DownloadProvider extends ChangeNotifier {
   }
 
   void removeDownload(Game game) {
-    downloadedGames.removeWhere((g) => g.id == game.id);
+    _downloadedGames.removeWhere((g) => g.id == game.id);
     notifyListeners();
   }
 }

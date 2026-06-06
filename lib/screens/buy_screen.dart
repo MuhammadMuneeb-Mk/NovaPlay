@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/game.dart';
+import '../providers/cart_provider.dart';
 import '../providers/owned_provider.dart';
+import '../providers/auth_provider.dart';
+import '../services/api_client.dart';
+import '../services/purchase_service.dart';
 
 class BuyScreen extends StatefulWidget {
   final Game game;
@@ -24,28 +28,42 @@ class _BuyScreenState extends State<BuyScreen> {
     super.dispose();
   }
 
-  void _processPurchase() {
+  void _processPurchase() async {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    if (cart.isInCart(widget.game.id!)) {
+      cart.removeFromCart(widget.game.id!);
+    }
     if (_formKey.currentState!.validate()) {
-      Provider.of<OwnedProvider>(context, listen: false).addOwned(widget.game.id);
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Purchase Successful"),
-          content: Text("You bought ${widget.game.title} for \$${total.toStringAsFixed(2)}. It will appear in your Library."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final apiClient = ApiClient(auth);
+      final purchaseService = PurchaseService(apiClient);
+      try {
+        await purchaseService.purchaseGame(widget.game.id!);
+        // Add to local owned provider
+        Provider.of<OwnedProvider>(context, listen: false).addOwned(widget.game.id!);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Purchase Successful"),
+            content: Text("You bought ${widget.game.title} for \$${total.toStringAsFixed(2)}. It will appear in your Library."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Purchase failed: $e')),
+        );
+      }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,11 +108,7 @@ class _BuyScreenState extends State<BuyScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
                   onPressed: _processPurchase,
                   child: const Text("Confirm Purchase"),
                 ),

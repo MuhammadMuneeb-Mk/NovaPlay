@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -27,25 +30,21 @@ class _SignupScreenState extends State<SignupScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Terms & Conditions'),
+          title: Text('Terms & Conditions'),
           content: SizedBox(
             width: double.maxFinite,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text(
-                    'NovaPlay Terms & Conditions',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
-                  ),
+                  Text('NovaPlay Terms & Conditions', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                   SizedBox(height: 12),
                   Text(
                     'Last updated: April 26, 2026\n\n'
                         '1. Acceptance of Terms\n'
                         'By creating an account on NovaPlay, you agree to be bound by these Terms & Conditions.\n\n'
                         '2. Ownership\n'
-                        'This application and all its content, features, and functionality are owned by Muneeb. '
-                        'All rights are reserved.\n\n'
+                        'This application and all its content, features, and functionality are owned by Muneeb. All rights are reserved.\n\n'
                         '3. Prohibited Use\n'
                         'You may not:\n'
                         '   - Copy, modify, or distribute any part of the app without written permission.\n'
@@ -64,30 +63,38 @@ class _SignupScreenState extends State<SignupScreen> {
                         'These terms shall be governed by the laws of your jurisdiction.\n\n'
                         '9. Contact\n'
                         'For any questions, please contact support at muneeb@novaplay.com\n\n'
-                        'By checking the box and clicking "Sign Up", you acknowledge that you have read, understood, '
-                        'and agree to be bound by these Terms & Conditions.',
+                        'By checking the box and clicking "Sign Up", you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions.',
                   ),
                 ],
               ),
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
           ],
         );
       },
     );
   }
 
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     if (_formKey.currentState!.validate() && _isChecked) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Account created! Please log in.")),
-      );
+      final username = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final authService = AuthService(authProvider);
+      final success = await authService.signup(username, email, password, username);
+      if (success) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Account created! Please log in.")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Signup failed")),
+        );
+      }
     } else if (!_isChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("You must accept the Terms & Conditions")),
@@ -105,10 +112,7 @@ class _SignupScreenState extends State<SignupScreen> {
           key: _formKey,
           child: Column(
             children: [
-              const Text(
-                "Create Account",
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-              ),
+              const Text("Create Account", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
               const SizedBox(height: 30),
               TextFormField(
                 controller: _nameController,
@@ -143,23 +147,16 @@ class _SignupScreenState extends State<SignupScreen> {
                 children: [
                   Checkbox(
                     value: _isChecked,
-                    onChanged: (value) {
-                      setState(() => _isChecked = value ?? false);
-                    },
+                    onChanged: (value) => setState(() => _isChecked = value ?? false),
                   ),
                   Expanded(
                     child: GestureDetector(
                       onTap: _showTermsDialog,
                       child: const Text(
                         'I have read and agree to the Terms & Conditions',
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                          )
+                        style: TextStyle(color: Colors.blue, fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                      ),
                     ),
-                  ),
                   ),
                 ],
               ),
