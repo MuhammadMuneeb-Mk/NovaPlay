@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/cart_provider.dart';
@@ -11,7 +10,6 @@ import 'providers/download_provider.dart';
 import 'providers/owned_provider.dart';
 import 'providers/auth_provider.dart';
 import 'screens/home_screen.dart';
-import 'widgets/web_frame.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,8 +56,6 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: context.watch<ThemeProvider>().themeMode,
-      // show the app at phone size in a desktop browser
-      builder: kIsWeb ? (context, child) => WebFrame(child: child!) : null,
       home: auth.isLoggedIn ? HomeScreen() : LoginScreen(),
     );
   }

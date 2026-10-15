@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/max_width.dart';
 import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/auth_provider.dart';
@@ -23,9 +24,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     final auth = context.read<AuthProvider>();
-    _displayNameController = TextEditingController(text: auth.user?['display_name']?.toString() ?? '');
-    _usernameController = TextEditingController(text: auth.user?['username']?.toString() ?? '');
-    _emailController = TextEditingController(text: auth.user?['email']?.toString() ?? '');
+    _displayNameController = TextEditingController(
+      text: auth.user?['display_name']?.toString() ?? '',
+    );
+    _usernameController = TextEditingController(
+      text: auth.user?['username']?.toString() ?? '',
+    );
+    _emailController = TextEditingController(
+      text: auth.user?['email']?.toString() ?? '',
+    );
   }
 
   @override
@@ -50,9 +57,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _updateProfile() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_hasChanges()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No changes to save')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No changes to save')));
       Navigator.pop(context);
       return;
     }
@@ -66,12 +73,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content: TextField(
           controller: passwordController,
           obscureText: true,
-          decoration: const InputDecoration(labelText: 'Enter your current password'),
+          decoration: const InputDecoration(
+            labelText: 'Enter your current password',
+          ),
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Confirm')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirm'),
+          ),
         ],
       ),
     );
@@ -91,7 +106,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userService = UserService(apiClient);
     final userId = auth.user?['id'];
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User not logged in')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in')));
       setState(() => _isUpdating = false);
       return;
     }
@@ -105,12 +122,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         currentPassword: currentPassword,
       );
       // Update AuthProvider.user
-      await auth.setToken(auth.token!, user: {
-        'id': updatedUser.id,
-        'username': updatedUser.username,
-        'email': updatedUser.email,
-        'display_name': updatedUser.displayName,
-      });
+      await auth.setToken(
+        auth.token!,
+        user: {
+          'id': updatedUser.id,
+          'username': updatedUser.username,
+          'email': updatedUser.email,
+          'display_name': updatedUser.displayName,
+        },
+      );
       // Update ProfileProvider
       context.read<ProfileProvider>().updateProfile(
         displayName: updatedUser.displayName,
@@ -129,20 +149,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         message = 'Email already registered. Please use another email.';
       } else if (message.contains('Current password is incorrect')) {
         message = 'Current password is incorrect.';
-      } else if (message.contains('401') || message.contains('Session expired')) {
+      } else if (message.contains('401') ||
+          message.contains('Session expired')) {
         message = 'Session expired. Please login again.';
         auth.logout();
         Navigator.pushReplacementNamed(context, '/login');
       } else if (message.contains('SocketException')) {
         message = 'Network error. Please check your connection.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       setState(() => _isUpdating = false);
     }
   }
 
-// Change password (separate dialog)
+  // Change password (separate dialog)
   Future<void> _changePassword() async {
     final currentPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
@@ -161,7 +184,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               TextFormField(
                 controller: currentPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Current Password'),
+                decoration: const InputDecoration(
+                  labelText: 'Current Password',
+                ),
                 validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 12),
@@ -169,20 +194,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 controller: newPasswordController,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'New Password'),
-                validator: (v) => v == null || v.length < 4 ? 'Minimum 4 characters' : null,
+                validator: (v) =>
+                    v == null || v.length < 4 ? 'Minimum 4 characters' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: confirmPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Confirm New Password'),
-                validator: (v) => v == newPasswordController.text ? null : 'Passwords do not match',
+                decoration: const InputDecoration(
+                  labelText: 'Confirm New Password',
+                ),
+                validator: (v) => v == newPasswordController.text
+                    ? null
+                    : 'Passwords do not match',
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
             onPressed: () {
               if (formKey.currentState!.validate()) {
@@ -202,7 +235,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userService = UserService(apiClient);
     final userId = auth.user?['id'];
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User not logged in')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in')));
       return;
     }
 
@@ -213,7 +248,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         newPassword: newPasswordController.text.trim(),
       );
       // Update local password in ProfileProvider (optional)
-      context.read<ProfileProvider>().updateProfile(password: newPasswordController.text.trim());
+      context.read<ProfileProvider>().updateProfile(
+        password: newPasswordController.text.trim(),
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password changed successfully!')),
       );
@@ -221,14 +258,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String message = e.toString().replaceAll('Exception: ', '');
       if (message.contains('Current password is incorrect')) {
         message = 'Current password is incorrect.';
-      } else if (message.contains('401') || message.contains('Session expired')) {
+      } else if (message.contains('401') ||
+          message.contains('Session expired')) {
         message = 'Session expired. Please login again.';
         auth.logout();
         Navigator.pushReplacementNamed(context, '/login');
       } else if (message.contains('SocketException')) {
         message = 'Network error. Please check your connection.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -236,54 +276,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Profile')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _displayNameController,
-                decoration: const InputDecoration(labelText: 'Display Name'),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Enter display name' : null,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Enter username' : null,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Enter email';
-                  if (!v.contains('@')) return 'Enter a valid email address';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isUpdating ? null : _updateProfile,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                  child: _isUpdating
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Save Profile'),
+      body: MaxWidth(
+        maxWidth: 640,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _displayNameController,
+                  decoration: const InputDecoration(labelText: 'Display Name'),
+                  validator: (v) => v == null || v.trim().isEmpty
+                      ? 'Enter display name'
+                      : null,
                 ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: _changePassword,
-                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.orange)),
-                  child: const Text('Change Password'),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Enter username' : null,
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return 'Enter email';
+                    if (!v.contains('@')) return 'Enter a valid email address';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isUpdating ? null : _updateProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: _isUpdating
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Save Profile'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _changePassword,
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.orange),
+                    ),
+                    child: const Text('Change Password'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -3,7 +3,7 @@
     "short_name": "NovaPlay",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0E1411",
+    "background_color": "#F5F7FA",
     "theme_color": "#30D507",
     "description": "A Flutter game store app.",
     "orientation": "portrait-primary",

@@ -2,7 +2,7 @@
 
 NovaPlay is a full‑stack mobile application where users can browse, buy, download (simulated), and manage games. It features a shopping cart, user authentication, persistent cart, game management for admins, and a carousel of featured games.
 
-**Web demo:** https://muhammadmuneeb-mk.github.io/NovaPlay/ (login: `demo` / `demo1234`)
+**Web demo:** https://muhammadmuneeb-mk.github.io/NovaPlay/ (click "Demo account" on the login screen)
 
 The web demo uses sample data instead of the real backend, see [Web demo](#-web-demo) below.
 

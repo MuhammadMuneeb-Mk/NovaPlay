@@ -20,14 +20,21 @@ class SettingsScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text('Profile', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text(
+          'Profile',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         ListTile(
           leading: CircleAvatar(
             backgroundColor: Theme.of(context).primaryColor,
             child: const Icon(Icons.person, color: Colors.white),
           ),
-          title: Text(profile.displayName.isEmpty ? 'Set display name' : profile.displayName),
+          title: Text(
+            profile.displayName.isEmpty
+                ? 'Set display name'
+                : profile.displayName,
+          ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () {
             Navigator.push(
@@ -37,7 +44,10 @@ class SettingsScreen extends StatelessWidget {
           },
         ),
         const Divider(height: 32),
-        const Text('App Theme', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text(
+          'App Theme',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 10),
         DropdownButtonFormField<ThemeMode>(
           value: themeProvider.themeMode,
@@ -46,9 +56,15 @@ class SettingsScreen extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
           items: const [
-            DropdownMenuItem(value: ThemeMode.light, child: Text('Light Theme')),
+            DropdownMenuItem(
+              value: ThemeMode.light,
+              child: Text('Light Theme'),
+            ),
             DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark Theme')),
-            DropdownMenuItem(value: ThemeMode.system, child: Text('System Theme')),
+            DropdownMenuItem(
+              value: ThemeMode.system,
+              child: Text('System Theme'),
+            ),
           ],
           onChanged: (ThemeMode? newMode) {
             if (newMode != null) themeProvider.setTheme(newMode);
@@ -83,10 +99,17 @@ class SettingsScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Reset demo data?'),
         content: const Text(
-            'This removes accounts, purchases and game edits made in this browser.'),
+          'This removes accounts, purchases and game edits made in this browser.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Reset')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Reset'),
+          ),
         ],
       ),
     );

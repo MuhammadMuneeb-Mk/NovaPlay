@@ -5,6 +5,7 @@ class GameImage extends StatelessWidget {
   final double width;
   final double height;
   final BoxFit fit;
+  final double borderRadius;
 
   const GameImage({
     super.key,
@@ -12,20 +13,24 @@ class GameImage extends StatelessWidget {
     this.width = 80,
     this.height = 80,
     this.fit = BoxFit.cover,
+    this.borderRadius = 10,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      imagePath,
-      width: width,
-      height: height,
-      fit: fit,
-      errorBuilder: (context, error, stackTrace) => Container(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: Image.asset(
+        imagePath,
         width: width,
         height: height,
-        color: Colors.grey[300],
-        child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: width,
+          height: height,
+          color: Colors.grey[300],
+          child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+        ),
       ),
     );
   }

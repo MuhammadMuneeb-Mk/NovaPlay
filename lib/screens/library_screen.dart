@@ -46,12 +46,23 @@ class _LibraryScreenState extends State<LibraryScreen> {
   List<Game> _applyFiltersAndSort(List<Game> ownedGames) {
     List<Game> filtered = ownedGames;
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((g) => g.title.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+      filtered = filtered
+          .where(
+            (g) => g.title.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
+          .toList();
     }
     if (_selectedFilter == 'Alphabetical') {
       filtered.sort((a, b) => a.title.compareTo(b.title));
     } else if (_selectedFilter == 'Installed') {
-      filtered = filtered.where((g) => Provider.of<DownloadProvider>(context, listen: false).isDownloaded(g)).toList();
+      filtered = filtered
+          .where(
+            (g) => Provider.of<DownloadProvider>(
+              context,
+              listen: false,
+            ).isDownloaded(g),
+          )
+          .toList();
     } else if (_selectedFilter == 'PriceLowHigh') {
       filtered.sort((a, b) => a.price.compareTo(b.price));
     } else if (_selectedFilter == 'PriceHighLow') {
@@ -75,17 +86,22 @@ class _LibraryScreenState extends State<LibraryScreen> {
       future: _futureGames,
       builder: (context, snapshot) {
         // _futureGames is null until owned games are loaded
-        if (_futureGames == null || snapshot.connectionState == ConnectionState.waiting) {
+        if (_futureGames == null ||
+            snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
           return Center(child: Text('Error loading games: ${snapshot.error}'));
         }
         final allGames = snapshot.data ?? [];
-        final ownedGames = allGames.where((game) => ownedProvider.isOwned(game.id)).toList();
+        final ownedGames = allGames
+            .where((game) => ownedProvider.isOwned(game.id))
+            .toList();
 
         if (ownedGames.isEmpty) {
-          return const Center(child: Text('No purchased games yet. Go to store and buy some!'));
+          return const Center(
+            child: Text('No purchased games yet. Go to store and buy some!'),
+          );
         }
 
         final displayGames = _applyFiltersAndSort(ownedGames);
@@ -99,7 +115,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search by title...',
                   prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onChanged: (v) => setState(() => _searchQuery = v),
               ),
@@ -114,12 +132,25 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     value: _selectedFilter,
                     items: const [
                       DropdownMenuItem(value: 'All', child: Text('All Games')),
-                      DropdownMenuItem(value: 'Alphabetical', child: Text('A-Z')),
-                      DropdownMenuItem(value: 'Installed', child: Text('Installed')),
-                      DropdownMenuItem(value: 'PriceLowHigh', child: Text('Price: Low to High')),
-                      DropdownMenuItem(value: 'PriceHighLow', child: Text('Price: High to Low')),
+                      DropdownMenuItem(
+                        value: 'Alphabetical',
+                        child: Text('A-Z'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Installed',
+                        child: Text('Installed'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'PriceLowHigh',
+                        child: Text('Price: Low to High'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'PriceHighLow',
+                        child: Text('Price: High to Low'),
+                      ),
                     ],
-                    onChanged: (value) => setState(() => _selectedFilter = value!),
+                    onChanged: (value) =>
+                        setState(() => _selectedFilter = value!),
                   ),
                 ],
               ),
@@ -133,20 +164,35 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   return Card(
                     margin: const EdgeInsets.all(8),
                     child: ListTile(
-                      leading: GameImage(imagePath: game.image, width: 50, height: 50),
+                      leading: GameImage(
+                        imagePath: game.image,
+                        width: 50,
+                        height: 50,
+                      ),
                       title: Text(game.title),
                       subtitle: Text(game.description),
                       trailing: isDownloaded
                           ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Colors.green),
-                        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Playing game... (demo)'))),
-                        child: const Text('Play'),
-                      )
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.green,
+                              ),
+                              onPressed: () =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Playing game... (demo)'),
+                                    ),
+                                  ),
+                              child: const Text('Play'),
+                            )
                           : ElevatedButton(
-                        style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Theme.of(context).primaryColor),
-                        onPressed: () => widget.onStartDownload(game),
-                        child: const Text('Download'),
-                      ),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Theme.of(context).primaryColor,
+                              ),
+                              onPressed: () => widget.onStartDownload(game),
+                              child: const Text('Download'),
+                            ),
                     ),
                   );
                 },

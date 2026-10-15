@@ -36,6 +36,48 @@ class _LoginScreenState extends State<LoginScreen> {
     _handleLogin();
   }
 
+  void _showDemoAccount() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Demo account"),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Use this account to try the app:"),
+            SizedBox(height: 12),
+            SelectableText(
+              "Username: ${MockBackend.demoUsername}\nPassword: ${MockBackend.demoPassword}",
+              style: TextStyle(fontWeight: FontWeight.bold, height: 1.6),
+            ),
+            SizedBox(height: 12),
+            Text(
+              "This version uses sample data saved in your browser.",
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _useDemoAccount();
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text("Log in as demo"),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final username = _identifierController.text.trim();
@@ -53,7 +95,10 @@ class _LoginScreenState extends State<LoginScreen> {
               password: password,
             );
           }
-          final ownedProvider = Provider.of<OwnedProvider>(context, listen: false);
+          final ownedProvider = Provider.of<OwnedProvider>(
+            context,
+            listen: false,
+          );
           final apiClient = ApiClient(authProvider);
           await ownedProvider.loadOwnedGames(apiClient);
           Navigator.pushReplacement(
@@ -70,13 +115,12 @@ class _LoginScreenState extends State<LoginScreen> {
         if (errorMsg.contains('SocketException')) {
           errorMsg = 'Network error. Please check your internet connection.';
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMsg)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMsg)));
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -84,115 +128,91 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Text(
-                  "NovaPlay",
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                    color: Theme.of(context).primaryColor,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Text(
+                    "NovaPlay",
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text("Your Game Store", style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 40),
-                if (AppConfig.demoMode) ...[
-                  _DemoBanner(onUseDemo: _useDemoAccount),
-                  const SizedBox(height: 24),
-                ],
-                TextFormField(
-                  controller: _identifierController,
-                  decoration: const InputDecoration(labelText: "Username or Email"),
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Enter username or email' : null,
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: "Password"),
-                  validator: (value) => value == null || value.isEmpty ? 'Enter your password' : null,
-                ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Your Game Store",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 40),
+                  TextFormField(
+                    controller: _identifierController,
+                    decoration: const InputDecoration(
+                      labelText: "Username or Email",
+                    ),
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? 'Enter username or email'
+                        : null,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: "Password"),
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Enter your password'
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      if (AppConfig.demoMode)
+                        TextButton.icon(
+                          onPressed: _showDemoAccount,
+                          icon: const Icon(Icons.person_outline, size: 18),
+                          label: const Text("Demo account"),
+                        ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ForgotPasswordScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text("Forgot Password?"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _handleLogin,
+                      child: const Text("Login"),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                        MaterialPageRoute(builder: (_) => const SignupScreen()),
                       );
                     },
-                    child: const Text("Forgot Password?"),
+                    child: const Text("Create an account"),
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _handleLogin,
-                    child: const Text("Login"),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SignupScreen()),
-                    );
-                  },
-                  child: const Text("Create an account"),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DemoBanner extends StatelessWidget {
-  final VoidCallback onUseDemo;
-  const _DemoBanner({required this.onUseDemo});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).primaryColor;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.science_outlined, color: color),
-              const SizedBox(width: 8),
-              const Text('Demo', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          const Text('This version uses sample data. Log in with demo / demo1234 or sign up.'),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: onUseDemo,
-              icon: const Icon(Icons.login),
-              label: const Text('Use demo account'),
-            ),
-          ),
-        ],
       ),
     );
   }

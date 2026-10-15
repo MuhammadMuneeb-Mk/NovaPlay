@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/max_width.dart';
 import 'package:provider/provider.dart';
 import '../models/game.dart';
 import '../services/api_client.dart';
@@ -36,7 +37,9 @@ class _AdminScreenState extends State<AdminScreen> {
       });
     } catch (e) {
       setState(() => _loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -47,8 +50,14 @@ class _AdminScreenState extends State<AdminScreen> {
         title: const Text('Delete Game'),
         content: Text('Delete "${game.title}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
@@ -59,9 +68,13 @@ class _AdminScreenState extends State<AdminScreen> {
       try {
         await gameService.deleteGame(game.id!);
         _loadGames();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Game deleted')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Game deleted')));
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -70,37 +83,46 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Admin - Manage Games')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-        itemCount: _games.length,
-        itemBuilder: (context, index) {
-          final game = _games[index];
-          return ListTile(
-            leading: GameImage(imagePath: game.image, width: 50, height: 50),
-            title: Text(game.title),
-            subtitle: Text('\$${game.price}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => AddEditGameScreen(game: game)),
-                    );
-                    if (result == true) _loadGames();
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _deleteGame(game),
-                ),
-              ],
-            ),
-          );
-        },
+      body: MaxWidth(
+        maxWidth: 900,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: _games.length,
+                itemBuilder: (context, index) {
+                  final game = _games[index];
+                  return ListTile(
+                    leading: GameImage(
+                      imagePath: game.image,
+                      width: 50,
+                      height: 50,
+                    ),
+                    title: Text(game.title),
+                    subtitle: Text('\$${game.price}'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => AddEditGameScreen(game: game),
+                              ),
+                            );
+                            if (result == true) _loadGames();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteGame(game),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
