@@ -48,7 +48,6 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
 
-    // ✅ SAME FIX FOR DARK
     colorScheme: ColorScheme.fromSeed(
       seedColor: primaryGreen,
       brightness: Brightness.dark,

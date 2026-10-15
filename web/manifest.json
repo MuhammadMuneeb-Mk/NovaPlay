@@ -1,11 +1,11 @@
 {
-    "name": "app_game",
-    "short_name": "app_game",
+    "name": "NovaPlay",
+    "short_name": "NovaPlay",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0E1411",
+    "theme_color": "#30D507",
+    "description": "A Flutter game store app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

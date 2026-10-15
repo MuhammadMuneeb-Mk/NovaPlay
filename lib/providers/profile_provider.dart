@@ -31,7 +31,6 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Verify current password
   bool verifyCurrentPassword(String currentPassword) {
     return _password == currentPassword;
   }

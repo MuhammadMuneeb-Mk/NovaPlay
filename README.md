@@ -2,6 +2,10 @@
 
 NovaPlay is a full‑stack mobile application where users can browse, buy, download (simulated), and manage games. It features a shopping cart, user authentication, persistent cart, game management for admins, and a carousel of featured games.
 
+**Web demo:** https://muhammadmuneeb-mk.github.io/NovaPlay/ (login: `demo` / `demo1234`)
+
+The web demo uses sample data instead of the real backend, see [Web demo](#-web-demo) below.
+
 ---
 
 ## 📖 Description
@@ -40,6 +44,14 @@ NovaPlay is a Flutter‑based game storefront backed by a Node.js REST API and a
 
 ---
 
+## 🌐 Web demo
+
+The demo is the same Flutter app built for the web with `--dart-define=DEMO_MODE=true`. In that mode all requests go to `lib/services/mock_backend.dart` instead of the Node.js server. It has the same routes as `backend/server.js` (login, signup, games CRUD, purchases, profile) and saves data in the browser, so nothing needs to be hosted except static files.
+
+It is deployed to GitHub Pages by `.github/workflows/deploy-web-demo.yml` when `main` is pushed.
+
+---
+
 ## 🛠️ Technologies Used
 
 ### Frontend (Flutter)
@@ -69,5 +81,25 @@ NovaPlay is a Flutter‑based game storefront backed by a Node.js REST API and a
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Muneeb-Khan-mk/NovaPlay.git
+git clone https://github.com/MuhammadMuneeb-Mk/NovaPlay.git
 cd NovaPlay
+```
+
+### 2. Run without the backend (demo mode)
+```bash
+flutter pub get
+flutter run -d chrome --dart-define=DEMO_MODE=true
+```
+
+### 3. Run with the real backend
+1. Create a MySQL database with `games`, `users` and `purchases` tables (columns as used in `backend/server.js`).
+2. In `backend/`, create a `.env` file with `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` and `JWT_SECRET`, then start the API:
+   ```bash
+   cd backend
+   npm install express mysql2 cors jsonwebtoken dotenv
+   node server.js
+   ```
+3. Run the app. It connects to `http://localhost:3000` on the web and `http://10.0.2.2:3000` on the Android emulator (see `lib/app_config.dart`):
+   ```bash
+   flutter run
+   ```

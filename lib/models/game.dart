@@ -1,23 +1,39 @@
 class Game {
-  final int id;
+  final int? id;
   final String title;
   final String image;
   final String description;
   final double price;
 
-  const Game({
-    required this.id,
+  Game({
+    this.id,
     required this.title,
     required this.image,
     required this.description,
     required this.price,
   });
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is Game && runtimeType == other.runtimeType && id == other.id;
+  factory Game.fromJson(Map<String, dynamic> json) {
+    // Convert price safely whether it's String or num
+    final priceRaw = json['price'];
+    final double priceValue = priceRaw is String
+        ? double.parse(priceRaw)
+        : (priceRaw as num).toDouble();
+    return Game(
+      id: json['id'],
+      title: json['title'],
+      image: json['image'],
+      description: json['description'],
+      price: priceValue,
+    );
+  }
 
-  @override
-  int get hashCode => id.hashCode;
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'image': image,
+      'description': description,
+      'price': price,
+    };
+  }
 }
