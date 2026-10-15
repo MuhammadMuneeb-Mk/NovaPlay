@@ -9,7 +9,6 @@ import 'downloads_screen.dart';
 import 'game_detail_screen.dart';
 import '../providers/profile_provider.dart';
 import '../providers/auth_provider.dart';
-import '../providers/download_provider.dart';
 import '../services/api_client.dart';
 import '../services/game_service.dart';
 import '../models/game.dart';
@@ -102,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Column(
           children: [
-            // Search bar
+            // 1. Search bar
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -116,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onChanged: (value) => setState(() => _searchQuery = value),
               ),
             ),
-            // Filter dropdown
+            // 2. Filter dropdown
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
@@ -137,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            // Carousel
+            // 3. Carousel (only if there are featured games)
             if (featuredGames.isNotEmpty)
               SizedBox(
                 height: 200,
@@ -159,7 +158,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: double.infinity,
                                 color: Colors.black54,
                                 padding: const EdgeInsets.all(8),
-                                child: Text(game.title, style: const TextStyle(color: Colors.white, fontSize: 16), textAlign: TextAlign.center),
+                                child: Text(
+                                  game.title,
+                                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ],
@@ -169,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-            // Game list
+            // 4. Game list (scrollable)
             Expanded(
               child: ListView.builder(
                 itemCount: displayGames.length,
@@ -209,6 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
   Widget _getScreen() {
     switch (_selectedIndex) {
@@ -274,9 +278,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.admin_panel_settings),
               title: const Text("Admin"),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminScreen()));
+                await Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminScreen()));
+                _loadGames(); // Refresh home screen after returning from admin
               },
             ),
             ListTile(

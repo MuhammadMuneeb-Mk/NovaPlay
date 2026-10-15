@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'http_client.dart';
 import '../app_config.dart';
 import '../providers/auth_provider.dart';
 
@@ -9,7 +9,7 @@ class AuthService {
   AuthService(this.auth);
 
   Future<bool> login(String username, String password) async {
-    final res = await http.post(
+    final res = await httpClient.post(
       Uri.parse('${AppConfig.baseUrl}/api/users/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'password': password}),
@@ -22,8 +22,13 @@ class AuthService {
     return false;
   }
 
-  Future<bool> signup(String username, String email, String password, String displayName) async {
-    final res = await http.post(
+  Future<bool> signup(
+    String username,
+    String email,
+    String password,
+    String displayName,
+  ) async {
+    final res = await httpClient.post(
       Uri.parse('${AppConfig.baseUrl}/api/users'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({

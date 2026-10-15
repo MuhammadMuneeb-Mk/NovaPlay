@@ -24,7 +24,7 @@ class OwnedProvider extends ChangeNotifier {
       _ownedIds.addAll(newIds);
       notifyListeners();
     } catch (e) {
-      print('Failed to load owned games: $e');
+      debugPrint('Failed to load owned games: $e');
     }
   }
 }

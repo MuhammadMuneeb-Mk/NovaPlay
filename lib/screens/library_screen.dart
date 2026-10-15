@@ -74,7 +74,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return FutureBuilder<List<Game>>(
       future: _futureGames,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        // _futureGames is null until owned games are loaded
+        if (_futureGames == null || snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {

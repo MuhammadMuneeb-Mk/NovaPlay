@@ -6,6 +6,7 @@ import '../providers/owned_provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_client.dart';
 import '../services/purchase_service.dart';
+import '../app_config.dart';
 
 class BuyScreen extends StatefulWidget {
   final Game game;
@@ -17,7 +18,8 @@ class BuyScreen extends StatefulWidget {
 
 class _BuyScreenState extends State<BuyScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _cardNumberController = TextEditingController();
+  final _cardNumberController =
+      TextEditingController(text: AppConfig.demoMode ? '4242 4242 4242 4242' : '');
 
   double get tax => widget.game.price * 0.10;
   double get total => widget.game.price + tax;
@@ -96,7 +98,13 @@ class _BuyScreenState extends State<BuyScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _cardNumberController,
-                decoration: const InputDecoration(labelText: "Card Number"),
+                decoration: InputDecoration(
+                  labelText: "Card Number",
+                  helperText: AppConfig.demoMode
+                      ? "Demo only, don't enter a real card"
+                      : null,
+                  helperMaxLines: 2,
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) return "Enter card number";

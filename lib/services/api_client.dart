@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'http_client.dart';
 import '../app_config.dart';
 import '../providers/auth_provider.dart';
 
@@ -9,7 +10,7 @@ class ApiClient {
   ApiClient(this.auth);
 
   Future<http.Response> get(String path) async {
-    final res = await http.get(
+    final res = await httpClient.get(
       Uri.parse('${AppConfig.baseUrl}$path'),
       headers: _headers(),
     );
@@ -17,7 +18,7 @@ class ApiClient {
   }
 
   Future<http.Response> post(String path, dynamic body) async {
-    final res = await http.post(
+    final res = await httpClient.post(
       Uri.parse('${AppConfig.baseUrl}$path'),
       headers: _headers(),
       body: jsonEncode(body),
@@ -26,7 +27,7 @@ class ApiClient {
   }
 
   Future<http.Response> put(String path, dynamic body) async {
-    final res = await http.put(
+    final res = await httpClient.put(
       Uri.parse('${AppConfig.baseUrl}$path'),
       headers: _headers(),
       body: jsonEncode(body),
@@ -35,7 +36,7 @@ class ApiClient {
   }
 
   Future<http.Response> delete(String path) async {
-    final res = await http.delete(
+    final res = await httpClient.delete(
       Uri.parse('${AppConfig.baseUrl}$path'),
       headers: _headers(),
     );

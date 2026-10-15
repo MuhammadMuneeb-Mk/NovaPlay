@@ -8,6 +8,7 @@ import '../services/game_service.dart';
 import '../models/game.dart';
 import '../widgets/cart_icon.dart';
 import '../widgets/game_image.dart';
+import 'cart_checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -65,29 +66,11 @@ class _CartScreenState extends State<CartScreen> {
 
   double get totalPrice => _cartGames.fold(0, (sum, g) => sum + g.price);
 
-  void _checkout() async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Checkout'),
-        content: Text('Total: \$${totalPrice.toStringAsFixed(2)}\n\nProceed to payment?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Provider.of<CartProvider>(context, listen: false).clearCart();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Order placed! (Demo)')),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Confirm'),
-          ),
-        ],
+  void _checkout() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartCheckoutScreen(cartGames: _cartGames),
       ),
     );
   }
