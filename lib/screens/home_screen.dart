@@ -12,6 +12,7 @@ import 'game_detail_screen.dart';
 import '../providers/profile_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/owned_provider.dart';
+import '../providers/download_provider.dart';
 import '../services/api_client.dart';
 import '../services/game_service.dart';
 import '../models/game.dart';
@@ -38,8 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
     "Settings",
     "Admin",
   ];
-  Game? _gameToDownload;
   Future<List<Game>>? _futureGames;
+  StreamSubscription<Game>? _downloadDone;
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -49,6 +50,21 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadGames();
+    // tell the user when a download finishes, whichever tab they are on
+    _downloadDone = context.read<DownloadProvider>().completed.listen((game) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('${game.title} is ready to play'),
+            action: SnackBarAction(
+              label: 'Library',
+              onPressed: () => setState(() => _selectedIndex = 1),
+            ),
+          ),
+        );
+    });
   }
 
   void _loadGames() {
@@ -84,21 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _downloadDone?.cancel();
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _startDownloadFromLibrary(Game game) {
-    setState(() {
-      _selectedIndex = 2;
-      _gameToDownload = game;
-    });
-  }
-
-  void _onDownloadStarted() {
-    setState(() {
-      _gameToDownload = null;
-    });
   }
 
   void _openGame(Game game) {
@@ -275,19 +279,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // fades between tabs instead of a hard cut
+  Widget _tabBody() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOut,
+      child: KeyedSubtree(key: ValueKey(_selectedIndex), child: _getScreen()),
+    );
+  }
+
   Widget _getScreen() {
     switch (_selectedIndex) {
       case 0:
         return _buildHome();
       case 1:
         return MaxWidth(
-          child: LibraryScreen(onStartDownload: _startDownloadFromLibrary),
+          child: LibraryScreen(
+            onOpenDownloads: () => setState(() => _selectedIndex = 2),
+            onBrowseStore: () => setState(() => _selectedIndex = 0),
+          ),
         );
       case 2:
         return MaxWidth(
           child: DownloadsScreen(
-            gameToDownload: _gameToDownload,
-            onDownloadStarted: _onDownloadStarted,
+            onOpenLibrary: () => setState(() => _selectedIndex = 1),
           ),
         );
       case 3:
@@ -465,10 +480,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _buildRail(context, width >= 1200),
                 const VerticalDivider(width: 1),
-                Expanded(child: _getScreen()),
+                Expanded(child: _tabBody()),
               ],
             )
-          : _getScreen(),
+          : _tabBody(),
       bottomNavigationBar: !wide && _selectedIndex <= 3
           ? BottomNavigationBar(
               currentIndex: _selectedIndex,
@@ -705,12 +720,15 @@ class _GameCard extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 16 / 10,
-              child: GameImage(
-                imagePath: game.image,
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
-                borderRadius: 0,
+              child: Hero(
+                tag: 'game-image-${game.id}',
+                child: GameImage(
+                  imagePath: game.image,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  borderRadius: 0,
+                ),
               ),
             ),
             Expanded(
@@ -787,7 +805,10 @@ class _GameListTile extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
-              GameImage(imagePath: game.image, width: 84, height: 84),
+              Hero(
+                tag: 'game-image-${game.id}',
+                child: GameImage(imagePath: game.image, width: 84, height: 84),
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),

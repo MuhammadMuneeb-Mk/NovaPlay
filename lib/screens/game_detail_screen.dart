@@ -131,12 +131,15 @@ class GameDetailScreen extends StatelessWidget {
                         children: [
                           AspectRatio(
                             aspectRatio: 16 / 9,
-                            child: GameImage(
-                              imagePath: game.image,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                              borderRadius: 16,
+                            child: Hero(
+                              tag: 'game-image-${game.id}',
+                              child: GameImage(
+                                imagePath: game.image,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                borderRadius: 16,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -177,12 +180,15 @@ class GameDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GameImage(
-                    imagePath: game.image,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                    borderRadius: 14,
+                  Hero(
+                    tag: 'game-image-${game.id}',
+                    child: GameImage(
+                      imagePath: game.image,
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                      borderRadius: 14,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ...titleAndPrice,

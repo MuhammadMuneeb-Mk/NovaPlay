@@ -109,7 +109,9 @@ class _CartScreenState extends State<CartScreen> {
                               height: 50,
                             ),
                             title: Text(game.title),
-                            subtitle: Text('\$${game.price.toStringAsFixed(2)}'),
+                            subtitle: Text(
+                              '\$${game.price.toStringAsFixed(2)}',
+                            ),
                             trailing: IconButton(
                               icon: const Icon(
                                 Icons.remove_shopping_cart,

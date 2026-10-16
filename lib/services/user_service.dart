@@ -8,7 +8,8 @@ class UserService {
   UserService(this.api);
 
   // Update profile (username, email, display_name) – requires currentPassword for verification
-  Future<User> updateUserProfile(int id, {
+  Future<User> updateUserProfile(
+    int id, {
     required String username,
     required String email,
     required String displayName,
@@ -30,7 +31,8 @@ class UserService {
   }
 
   // Change password only – requires currentPassword and newPassword
-  Future<void> changePassword(int id, {
+  Future<void> changePassword(
+    int id, {
     required String currentPassword,
     required String newPassword,
   }) async {
@@ -44,5 +46,4 @@ class UserService {
       throw Exception(errorBody['message'] ?? 'Password change failed');
     }
   }
-
 }
