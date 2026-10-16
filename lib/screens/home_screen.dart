@@ -18,6 +18,7 @@ import '../services/game_service.dart';
 import '../models/game.dart';
 import '../widgets/cart_icon.dart';
 import '../widgets/game_image.dart';
+import '../widgets/cover_art.dart';
 import '../widgets/max_width.dart';
 
 // screens wider than this get a side navigation rail instead of the bottom bar
@@ -605,53 +606,92 @@ class _FeaturedCarouselState extends State<_FeaturedCarousel> {
                 final game = widget.games[index];
                 return GestureDetector(
                   onTap: () => widget.onOpen(game),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      GameImage(
-                        imagePath: game.image,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                        borderRadius: 0,
-                      ),
-                      const DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, Colors.black87],
-                            stops: [0.45, 1],
+                  child: LayoutBuilder(
+                    builder: (context, box) {
+                      final compact = box.maxWidth < 560;
+                      final cover = (box.maxHeight - 56).clamp(90.0, 250.0);
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          BlurredCover(imagePath: game.image),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              widget.showArrows ? 64 : 20,
+                              20,
+                              widget.showArrows ? 64 : 20,
+                              28,
+                            ),
+                            child: Row(
+                              children: [
+                                CoverCard(imagePath: game.image, size: cover),
+                                SizedBox(width: compact ? 16 : 32),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        game.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: compact ? 20 : 30,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (!compact) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          game.description,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: 14),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            _priceLabel(game),
+                                            style: TextStyle(
+                                              color: Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          if (!compact) ...[
+                                            const SizedBox(width: 20),
+                                            ElevatedButton(
+                                              onPressed: () =>
+                                                  widget.onOpen(game),
+                                              style: ElevatedButton.styleFrom(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 22,
+                                                      vertical: 12,
+                                                    ),
+                                              ),
+                                              child: const Text('View game'),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 20,
-                        right: 20,
-                        bottom: 28,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              game.title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _priceLabel(game),
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
                   ),
                 );
               },

@@ -5,8 +5,8 @@ import '../providers/owned_provider.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/cart_icon.dart';
 import 'buy_screen.dart';
-import '../widgets/game_image.dart';
 import '../widgets/max_width.dart';
+import '../widgets/cover_art.dart';
 
 class GameDetailScreen extends StatelessWidget {
   final Game game;
@@ -131,16 +131,7 @@ class GameDetailScreen extends StatelessWidget {
                         children: [
                           AspectRatio(
                             aspectRatio: 16 / 9,
-                            child: Hero(
-                              tag: 'game-image-${game.id}',
-                              child: GameImage(
-                                imagePath: game.image,
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                                borderRadius: 16,
-                              ),
-                            ),
+                            child: _CoverHeader(game: game, coverSize: 240),
                           ),
                           const SizedBox(height: 24),
                           ...aboutGame,
@@ -180,15 +171,9 @@ class GameDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Hero(
-                    tag: 'game-image-${game.id}',
-                    child: GameImage(
-                      imagePath: game.image,
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                      borderRadius: 14,
-                    ),
+                  SizedBox(
+                    height: 220,
+                    child: _CoverHeader(game: game, coverSize: 170),
                   ),
                   const SizedBox(height: 16),
                   ...titleAndPrice,
@@ -203,6 +188,32 @@ class GameDetailScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _CoverHeader extends StatelessWidget {
+  final Game game;
+  final double coverSize;
+
+  const _CoverHeader({required this.game, required this.coverSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          BlurredCover(imagePath: game.image),
+          Center(
+            child: Hero(
+              tag: 'game-image-${game.id}',
+              child: CoverCard(imagePath: game.image, size: coverSize),
+            ),
+          ),
+        ],
       ),
     );
   }

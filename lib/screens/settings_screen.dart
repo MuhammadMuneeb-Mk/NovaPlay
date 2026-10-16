@@ -4,7 +4,6 @@ import '../providers/theme_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/download_provider.dart';
 import 'profile_screen.dart';
-import 'beta_screen.dart';
 import '../app_config.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
@@ -122,35 +121,11 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             children: [
               ListTile(
-                leading: const Icon(Icons.view_carousel_outlined),
-                title: const Text('Beta features'),
-                subtitle: const Text('Game carousel preview'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const BetaScreen()),
-                ),
-              ),
-              const Divider(height: 1),
-              ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: const Text('About NovaPlay'),
-                onTap: () => showAboutDialog(
-                  context: context,
-                  applicationName: 'NovaPlay',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: Icon(
-                    Icons.sports_esports,
-                    color: primary,
-                    size: 40,
-                  ),
-                  children: const [
-                    Text(
-                      'A game store app made with Flutter, Provider and a '
-                      'Node.js / Express REST API with a MySQL database.',
-                    ),
-                  ],
-                ),
+                subtitle: const Text('Version 1.0.0'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showAbout(context),
               ),
               if (AppConfig.demoMode) ...[
                 const Divider(height: 1),
@@ -165,6 +140,89 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showAbout(BuildContext context) {
+    final primary = Theme.of(context).primaryColor;
+    const stack = [
+      'Flutter',
+      'Dart',
+      'Provider',
+      'Node.js',
+      'Express',
+      'MySQL',
+      'JWT',
+    ];
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 8),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 380),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF111814),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(Icons.sports_esports, color: primary, size: 44),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'NovaPlay',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 2),
+              const Text('Version 1.0.0', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 16),
+              Text(
+                AppConfig.demoMode
+                    ? 'A game store app built with Flutter. The full version talks to a Node.js REST API and a MySQL database; this web demo uses a built-in copy of that API with sample data.'
+                    : 'A game store app built with Flutter, backed by a Node.js REST API and a MySQL database.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (final item in stack)
+                    Chip(
+                      label: Text(item),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Made by Muhammad Muneeb Khan',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => showLicensePage(
+              context: context,
+              applicationName: 'NovaPlay',
+              applicationVersion: '1.0.0',
+            ),
+            child: const Text('Licenses'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 
