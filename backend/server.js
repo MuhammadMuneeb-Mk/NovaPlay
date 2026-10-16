@@ -19,7 +19,11 @@ const pool = mysql.createPool({
 });
 const promisePool = pool.promise();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'my_secret_key_change_this';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('JWT_SECRET is not set. Add it to backend/.env before starting the server.');
+    process.exit(1);
+}
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
