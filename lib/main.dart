@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/cart_provider.dart';
 import 'screens/auth/login_screen.dart';
-import 'services/api_client.dart';
 import 'utils/theme.dart';
 import 'providers/theme_provider.dart';
 import 'providers/profile_provider.dart';
@@ -14,20 +13,11 @@ import 'screens/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final authProvider = AuthProvider();
-  await authProvider.loadToken();
+  // always start on the login screen, even if a session was saved last time
+  await authProvider.logout();
 
-  // if already logged in, load profile and owned games like the login screen does
   final profileProvider = ProfileProvider();
   final ownedProvider = OwnedProvider();
-  final user = authProvider.user;
-  if (authProvider.isLoggedIn && user != null) {
-    profileProvider.setProfile(
-      displayName: user['display_name'] ?? user['username'] ?? '',
-      identifier: user['email'] ?? user['username'] ?? '',
-      password: '',
-    );
-    ownedProvider.loadOwnedGames(ApiClient(authProvider));
-  }
 
   runApp(
     MultiProvider(

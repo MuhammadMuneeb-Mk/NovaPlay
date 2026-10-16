@@ -98,7 +98,7 @@ class _AdminScreenState extends State<AdminScreen> {
                       height: 50,
                     ),
                     title: Text(game.title),
-                    subtitle: Text('\$${game.price}'),
+                    subtitle: Text('\$${game.price.toStringAsFixed(2)}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

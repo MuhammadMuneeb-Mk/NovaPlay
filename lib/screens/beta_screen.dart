@@ -146,7 +146,7 @@ class BetaScreen extends StatelessWidget {
                                       Text(
                                         game.price == 0
                                             ? "FREE"
-                                            : "\$${game.price}",
+                                            : "\$${game.price.toStringAsFixed(2)}",
                                         style: TextStyle(
                                           color: Theme.of(context).primaryColor,
                                           fontWeight: FontWeight.bold,
